@@ -50,6 +50,7 @@ def czyJuzPora():
 
 def sendSMS(tresc):
 	text_subtype = 'plain' #plain, html, xml
+	charset = 'utf-8' #utf-8 dla polskich znakow
 	domena = ''
 	usePrefix = False
 	if config.siec == "plus":
@@ -61,7 +62,7 @@ def sendSMS(tresc):
 		domena = "@text.plusgsm.pl" #by nie bylo jakis nieporozumien
 
 	try:
-		msg = MIMEText(tresc, text_subtype)
+		msg = MIMEText(tresc, text_subtype, charset)
 		msg['Subject'] = 'Info' #temat wiadomosci
 		if usePrefix == True:
 			msg['To'] += config.prefix
@@ -76,13 +77,13 @@ def sendSMS(tresc):
 		finally:
 			conn.close()
 	except Exception, exc:
-		ekg.command("gg:msg %s SMS Failed: %s" % (admin, str(exc))) # give a error message
+		ekg.command("gg:msg %s SMS Failed: %s" % (config.admin, str(exc))) # give a error message
 
 def checkMail():
 	for email in config.emails:
 		try:
-			obj = IMAP4_SSL("imap." + config.email[0], imap_port)
-			obj.login(config.email[1][0], config.email[1][1])
+			obj = IMAP4_SSL("imap." + email[0], config.imap_port)
+			obj.login(email[1][0], email[1][1])
 			try:
 				obj.select()
 				obj.search(None, 'UnSeen')
@@ -96,30 +97,30 @@ def checkMail():
 			finally:
 				obj.close()
 		except Exception, exc:
-			ekg.command("gg:msg %s IMAP %s Failed: %s" % (admin, email[0], str(exc))) # give a error message
+			ekg.command("gg:msg %s IMAP %s Failed: %s" % (config.admin, email[0], str(exc))) # give a error message
 
 		jednaWiad = "Masz 1 nowa wiadomosc na koncie"
 		doPiecWiad = "nowe wiadomosci na koncie"
 		kilkaWiad = "nowych wiadomosci na koncie"
 		sms = ""
 
-		if not email[2]["email_memory"] == fc:
+		if not email[2]["email_memory"] == ilosc_maili:
 			if email[2]["mem"] == 1:
 				if wyslijWiad == True:
-					ekg.command('gg:msg %s %s%s.' % (admin, jednaWiad, email[0]))
+					ekg.command('gg:msg %s %s%s.' % (config.admin, jednaWiad, email[0]))
 				elif wyslijWiad == False and czyJuzPora() == True:
-					sms += jednaWiad + " " + konta[0] + "\n"
+					sms += jednaWiad + " " + email[0] + "\n"
 			elif 1 < email[2]["mem"] < 5:
 				if wyslijWiad == True:
-					ekg.command('gg:msg %s Masz %d %s %s.' % (admin, email[2]["mem"], doPiecWiad, email[0]))
+					ekg.command('gg:msg %s Masz %d %s %s.' % (config.admin, email[2]["mem"], doPiecWiad, email[0]))
 				elif wyslijWiad == False and czyJuzPora() == True:
 					sms += "Masz " + email[2]["mem"] + " " + doPiecWiad + " " + email[0] + "\n"
 			elif email[2]["mem"] > 5:
 				if wyslijWiad == True:
-					ekg.command('gg:msg %s Masz %d %s %s.' % (admin, email[2]["mem"], kilkaWiad, email[0]))
+					ekg.command('gg:msg %s Masz %d %s %s.' % (config.admin, email[2]["mem"], kilkaWiad, email[0]))
 				elif wyslijWiad == False and czyJuzPora() == True:
 					sms += "Masz " + email[2]["mem"] + " " + kilkaWiad + " " + email[0] + "\n"
-			email[2]["email_memory"] = fc
+			email[2]["email_memory"] = ilosc_maili
 
 	if not sms:
 		sendSMS(sms)
@@ -129,7 +130,7 @@ def init():
 
 def status_handler(session, uid, status, desc):
 	global wyslijWiad
-	if uid == admin:
+	if uid == config.admin:
 		if not status == ekg.STATUS_NA:
 			wyslijWiad = True
 			return 1
@@ -138,7 +139,7 @@ def status_handler(session, uid, status, desc):
 			return 0
 
 def message_handler(session, uid, type, text, sent_time, ignore_level):
-		if uid == admin:
+		if uid == config.admin:
 			if text == "!checkmail":
 				checkMail()
 				return 1
@@ -146,22 +147,22 @@ def message_handler(session, uid, type, text, sent_time, ignore_level):
 				rssReader()
 				return 1
 		elif text == "!wersja":
-			ekg.command('gg:msg %s Moja wersja to %s' % (uid, version))
+			ekg.command('gg:msg %s Moja wersja to %s' % (uid, config.version))
 			return 1
 		elif text == "!autorzy":
-			ekg.command('gg:msg %s Stworzyl mnie %s i nadal rozwija.' % (uid, autor))
+			ekg.command('gg:msg %s Stworzyl mnie %s i nadal rozwija.' % (uid, config.autor))
 			return 1
 		else:
-			ekg.command('gg:msg %s Witaj! Nazywam sie %s i jestem botem GG stworzonym i rozwijanym przez %s .\nBot zostal wylacznie do uzytku autora. Nie masz co szukac :)' % (uid, nazwa_kodowa, autor))
+			ekg.command('gg:msg %s Witaj! Nazywam sie %s i jestem botem GG stworzonym i rozwijanym przez %s .\nBot zostal wylacznie do uzytku autora. Nie masz co szukac :)' % (uid, config.nazwa_kodowa, config.autor))
 			return 1
 
 def connect_handler(session):
 		ekg.echo("Sesja : " + session)
 		sesja = ekg.session_get(session)
 		if sesja.connected():
-		ekg.echo('Połączony! Silnik i sto turbin poszło w ruch! :)')
+			ekg.echo('Połączony! Silnik i sto turbin poszło w ruch! :)')
 		else:
-		ekg.echo('W tym miejscu jeszcze nie połączony')
+			ekg.echo('W tym miejscu jeszcze nie połączony')
 
 ekg.handler_bind('protocol-connected', connect_handler)
 ekg.handler_bind('protocol-status', status_handler)
