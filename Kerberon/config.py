@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #config do skryptu
-
+#TODO: Automatyczny konfigurator
 
 #sms sender
 numer = "+48601000000" # koniecznie +48
@@ -14,7 +14,7 @@ smtp_port = 465 # port od SMTP
 emails = ( #domain, (login, pass), {pamiec, pamiec2}
 		("huczu.pl",("admin@huczu.pl","pass",),{"email_memory":0, "mem":0,})
 		("gmail.com",("huczu93@gmail.com","pass",), {"email_memory":0, "mem":0}),
-		("huk.mail.pl",("andrzej@huk.mal.pl","pass",), {"email_memory":0, "mem":0}),
+		("huk.mail.pl",("andrzej@huk.mail.pl","pass",), {"email_memory":0, "mem":0}),
 )
 
 #Other
