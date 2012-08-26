@@ -13,7 +13,7 @@ server = 1 # Ktory e-mail ma odpowiadac za wyslanie wiadomosci na nasza komorke 
 imap_port = 993 # port od IMAP
 smtp_port = 465 # port od SMTP
 emails = ( #domain, (login, pass), {pamiec, pamiec2}
-		("huczu.pl",("admin@huczu.pl","pass",),{"email_memory":0, "mem":0,})
+		("huczu.pl",("admin@huczu.pl","pass",),{"email_memory":0, "mem":0,}),
 		("gmail.com",("huczu93@gmail.com","pass",), {"email_memory":0, "mem":0}),
 		("huk.mail.pl",("andrzej@huk.mail.pl","pass",), {"email_memory":0, "mem":0}),
 )
