@@ -21,7 +21,7 @@ wyslijWiad = False
 
 def rssReader(): #TODO: Formatowanie RSS
 	wiadomosc = ''
-	kanal = feedparser.parse(wykop_rss)
+	kanal = feedparser.parse(config.wykop_rss)
 	ilosc_obecna = len(kanal.entries)
 	ilosc_rss["rss_mem"] = ilosc_obecna
 	if not ilosc_rss["rss"] == ilosc_obecna:
@@ -51,17 +51,22 @@ def czyJuzPora():
 def sendSMS(tresc):
 	text_subtype = 'plain' #plain, html, xml
 	domena = ''
+	usePrefix = False
 	if config.siec == "plus":
+		usePrefix = True
 		domena = "@text.plusgsm.pl"
 	elif config.siec == "orange":
-		domena = "@todo" #TODO: Tworzenie maila do wyslania smsm, moze cos lepszego niz if/elif?
+		domena = "@sms.orange.pl" #TODO: Tworzenie maila do wyslania smsm, moze cos lepszego niz if/elif?
 	else:
 		domena = "@text.plusgsm.pl" #by nie bylo jakis nieporozumien
 
 	try:
 		msg = MIMEText(tresc, text_subtype)
 		msg['Subject'] = 'Info' #temat wiadomosci
-		msg['To'] = config.numer + domena #TODO: konfiguracja serwera sms
+		if usePrefix == True:
+			msg['To'] += config.prefix
+
+		msg['To']  += config.numer + domena #TODO: konfiguracja serwera sms
 		msg['From'] = config.emails[config.server][1][0] #nawet nie dziala ale musi byc
 
 		conn = SMTP_SSL('smtp.' + config.emails[config.server][0], config.smtp_port)
@@ -74,10 +79,10 @@ def sendSMS(tresc):
 		ekg.command("gg:msg %s SMS Failed: %s" % (admin, str(exc))) # give a error message
 
 def checkMail():
-	for email in emails:
+	for email in config.emails:
 		try:
-			obj = IMAP4_SSL("imap." + email[0], imap_port)
-			obj.login(email[1][0], email[1][1])
+			obj = IMAP4_SSL("imap." + config.email[0], imap_port)
+			obj.login(config.email[1][0], config.email[1][1])
 			try:
 				obj.select()
 				obj.search(None, 'UnSeen')

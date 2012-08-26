@@ -4,8 +4,9 @@
 #TODO: Automatyczny konfigurator
 
 #sms sender
-numer = "+48601000000" # koniecznie +48
-siec = "plus" # na razie obslugiwany tylko Plus
+numer = "601000000" # numer telefonu na ktory ma byc wyslany sms
+prefix = "+48" # Okazuje sie ze prefix jest niezbedny dla Plusa, a dla Orange nie :(
+siec = "plus" # Polska: plus, orange Zagraniczne: http://en.wikipedia.org/wiki/List_of_SMS_gateways
 czas = (9,23) #dozwolony czas w ktorym moze wyslac sms niech nas kuhwa nie budzi o 3 nad ranem, ze nowe gacie -30% w croppie
 server = 1 # Ktory e-mail ma odpowiadac za wyslanie wiadomosci na nasza komorke liczymy z krotki od 0, polecam gmail
 #Mailer
