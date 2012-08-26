@@ -54,7 +54,7 @@ def sendSMS(tresc):
 	if config.siec == "plus":
 		domena = "@text.plusgsm.pl"
 	elif config.siec == "orange":
-		domena = "@todo" # todo
+		domena = "@todo" #TODO: Tworzenie maila do wyslania smsm, moze cos lepszego niz if/elif?
 	else:
 		domena = "@text.plusgsm.pl" #by nie bylo jakis nieporozumien
 
